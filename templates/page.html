@@ -1,64 +1,51 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Software bill of materials for {{ component.name }}</title>
+    <title>Software bill of materials for EcoSys</title>
+    <style>
+      table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+        padding-left: 5px;
+      }
+    </style>
   </head>
   <body>
     <main>
-      {{#component}}
-      <h1>Software bill of materials for {{ name }}</h1>
-      <ul>
-        <li>Type: {{ type }}</li>
-        <li>Version: {{ version }}</li>
-        <li>Author: <a href="https://google.com?q={{ component.author }}">{{ component.author }}</a></li>
-        <li>Description: {{ description }}</li>
-        <li>purl: {{ purl }}</li>
-        {{#externalReferences}}
-          <li>{{ type }}: <a href="{{url}}" target="_blank">{{ url }}</a></li>
-        {{/externalReferences}}
-      </ul>
-      {{/component}}
-
-      <div>
-        <h2>Components in {{ component.name }}</h1>
+      <div style="display: none;">
+        <h3>License Types</h3>
         <ul>
-          <li>Total: {{ count }}</li>
-          <li>Duplicates: {{ duplicateCount }}</li>
-        </ul>
-        <script>
-          // simple filtering 
-          function filter() {
-            const input = document.getElementById("filterInput").value;
-            const rows = document.getElementsByClassName("component-row");
-
-            for(let i = 0; i < rows.length; i++) {
-              let row = rows[i];
-
-              if(!row.id.includes(input)) {
-                row.style.display = "none";
-              } else {
-                row.style.display = "";
-              }
-            }
-          }
-        </script>
-        <label>
-          Filter:
-          <input type="text" id="filterInput" />
-        </label>
-        <button onClick="filter();">Filter</button>
-      </div>
-
-      {{#components}}
-      <div class="component-row" id="{{ name }}">
-        <h4><a href="https://socket.dev/npm/package/{{ name }}">{{name}}</a> {{ versions }}</h4>
-        <ul>
-          {{#externalReferences}}
-            <li>{{ type }}: <a href="{{url}}" target="_blank">{{ url }}</a></li>
-          {{/externalReferences}}
+          {{#licenses}}
+          <li>{{.}}</li>
+          {{/licenses}}
         </ul>
       </div>
-      {{/components}}
+      
+      <h3>Components</h3>
+      <table border="">
+          <tr>
+            <th align="left">Name</th>
+            <th align="left">Version</th>
+            <th align="left">Description</th>
+            <th align="left">License</th>
+            <th align="left">Links</th>
+          </tr>
+
+          {{#components}}
+          <tr>
+            <td width="10%">{{ name }}</td>
+            <td width="10%">{{ version }}</td>
+            <td width="55%">{{ description }}</td>
+            <td width="10%">{{ licenses }}</td>
+            <td width="15%">
+              {{#externalReferences}}
+              <li><a href="{{ url }}" target="_blank">{{ type }}</a></li>
+              {{/externalReferences}}
+            </td>
+          </tr>
+          {{/components}}
+        
+      </table>
     </main>
   </body>
 </html>

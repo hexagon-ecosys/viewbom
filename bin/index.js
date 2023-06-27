@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 const fs = require('fs'); // needed for reading & writing to files
 const mustache = require('mustache'); // needed for rendering templates
+const path = require('path');
 
 /*
   viewBom
@@ -23,60 +24,83 @@ const mustache = require('mustache'); // needed for rendering templates
   see https://www.npmjs.com/package/mustache
 */
 
-function analyze(bom) {
-  // count the number of components
-  const count = bom.components.length;
+const analyze = (bom) => {
+  const analysis = [];
+  const licenseMap = new Map();
+  
+  for(const component of bom.components) {
+    
+    const licenses = component.licenses;
+    let licenseString = '';
+    if (licenses) {
+      const licenseArray = [];
+      licenses.forEach(lic => {
+        if (lic.license && lic.license.id) {
+          licenseArray.push(lic.license.id);
+          licenseMap.set(lic.license.id, lic.license.id);
+        }
+      });
 
-  // find any duplicates
-  let duplicateCount = 0;
-  let filteredComponents = [];
-  let histogram = {};
-  for(component of bom.components) {
-    if(!histogram[component.name]) {
-      histogram[component.name] = { ...component, versions: [component.version] };
-    } else {
-      histogram[component.name].versions.push(component.version);
+      licenseString = licenseArray.join(', ');
     }
+    
+    analysis.push({ 
+      name: component.name, 
+      version: component.version,
+      description: component.description,
+      licenses: licenseString,
+      externalReferences: component.externalReferences });
   }
 
-  // push components into filteredComponents array
-  for(key in histogram) {
-    filteredComponents.push({ name: key, versions: histogram[key].versions.join(", "), externalReferences: histogram[key].externalReferences });
-
-    // if there are multiple versions of this package, then count it
-    if(Array.isArray(histogram[key].versions) && histogram[key].versions.length > 1) {
-      duplicateCount++;
-    }
+  const lic = [];
+  for (const kv of licenseMap) {
+    lic.push(kv[0]);
   }
 
   // returned the analyzed bom
-  return { component: bom.metadata.component, components: filteredComponents, count, duplicateCount };
-}
+  return { licenses: lic, components: analysis };
+};
 
-function renderToHtml(analysis, templatePath) {
+
+const renderToHtml = (analysis, templatePath) => {
   const template = fs.readFileSync(templatePath, 'utf8');
   const output = mustache.render(template, analysis);
   return output;
-}
+};
 
-function viewBom(inputFilePath, outputFilePath) {
+const viewBom = (inputFilePath, outputFilePath) => {
   // get the arguments
   const args = process.argv.slice(2);
-  const inputFile = inputFilePath || args[0] || "example/bom.json";
-  const outputFile = outputFilePath || args[1] || "output.html";
+  const inputFile = inputFilePath || args[0] || null;
+  if (!inputFile) {
+    throw new Error('Usage: viewBom <inputBomFileInJson> <outputFileInHtml>'); 
+  }
+
+  let outputFile = outputFilePath || args[1] || null;
+
+  if (!outputFile) {
+    const pathElements = path.parse(inputFile);
+    if (pathElements) {
+      outputFile = pathElements.dir + path.sep + pathElements.name + '.html';
+      console.log('Output file will be written to: ' + outputFile);
+    }
+    else {
+      throw new Error('Usage: viewBom <inputBomFileInJson> <outputFileInHtml>'); 
+    }
+  }
 
   // read the json in the input file
   const rawdata = fs.readFileSync(inputFile);
   const bom = JSON.parse(rawdata);
 
   const analysis = analyze(bom);
-  const html = renderToHtml(analysis, `${__dirname}/../templates/page.html`)
+  const html = renderToHtml(analysis, `${__dirname}/../templates/page.html`);
 
   // write to a file
   fs.writeFileSync(outputFile, html);
 
   process.exit(0);
-}
+};
 
 module.exports = [
   analyze,
