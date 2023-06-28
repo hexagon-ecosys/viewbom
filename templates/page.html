@@ -34,12 +34,12 @@
           {{#components}}
           <tr>
             <td width="10%">{{ name }}</td>
-            <td width="10%">{{ version }}</td>
-            <td width="55%">{{ description }}</td>
+            <td width="5%">{{ version }}</td>
+            <td width="40%">{{ description }}</td>
             <td width="10%">{{ licenses }}</td>
-            <td width="15%">
+            <td width="35%">
               {{#externalReferences}}
-              <li><a href="{{ url }}" target="_blank">{{ type }}</a></li>
+              <li>{{ type }}: {{ url }}</li>
               {{/externalReferences}}
             </td>
           </tr>
