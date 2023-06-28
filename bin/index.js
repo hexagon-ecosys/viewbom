@@ -27,6 +27,7 @@ const path = require('path');
 const analyze = (bom) => {
   const analysis = [];
   const licenseMap = new Map();
+  const linkMap = new Map();
   
   for(const component of bom.components) {
     
@@ -44,12 +45,24 @@ const analyze = (bom) => {
       licenseString = licenseArray.join(', ');
     }
     
+    const extRefs = component.externalReferences;
+    let linkMapKey = 1;
+    for (const ref of extRefs) {
+      if (ref.type) {
+        linkMap.set(ref.type, ref.type);
+      }
+      else {
+        linkMap.set('Link' + linkMapKey, 'Link' + linkMapKey);
+        linkMapKey++;
+      }
+    }
+
     analysis.push({ 
       name: component.name, 
       version: component.version,
       description: component.description,
       licenses: licenseString,
-      externalReferences: component.externalReferences });
+      externalReferences: extRefs });
   }
 
   const lic = [];
@@ -57,8 +70,13 @@ const analyze = (bom) => {
     lic.push(kv[0]);
   }
 
+  const refs = [];
+  for (const kv of linkMap) {
+    refs.push(kv[0]);
+  }
+
   // returned the analyzed bom
-  return { licenses: lic, components: analysis };
+  return { licenses: lic, links: refs, components: analysis };
 };
 
 

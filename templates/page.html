@@ -28,20 +28,20 @@
             <th align="left">Version</th>
             <th align="left">Description</th>
             <th align="left">License</th>
-            <th align="left">Links</th>
+            {{#links}}
+            <th align="left">{{.}}</th>
+            {{/links}}
           </tr>
 
           {{#components}}
           <tr>
-            <td width="10%">{{ name }}</td>
+            <td width="5%">{{ name }}</td>
             <td width="5%">{{ version }}</td>
-            <td width="40%">{{ description }}</td>
-            <td width="10%">{{ licenses }}</td>
-            <td width="35%">
-              {{#externalReferences}}
-              <li>{{ type }}: {{ url }}</li>
-              {{/externalReferences}}
-            </td>
+            <td width="35%">{{ description }}</td>
+            <td width="5%">{{ licenses }}</td>
+            {{#externalReferences}}
+            <td>{{ url }}</td>
+            {{/externalReferences}}
           </tr>
           {{/components}}
         
