@@ -46,14 +46,15 @@ const analyze = (bom) => {
     }
     
     const extRefs = component.externalReferences;
-    let linkMapKey = 1;
-    for (const ref of extRefs) {
-      if (ref.type) {
-        linkMap.set(ref.type, ref.type);
-      }
-      else {
-        linkMap.set('Link' + linkMapKey, 'Link' + linkMapKey);
-        linkMapKey++;
+    if (extRefs) {
+      let linkMapKey = 1;
+      for (const ref of extRefs) {
+        if (ref.type) {
+          linkMap.set(ref.type, ref.type);
+        } else {
+          linkMap.set('Link' + linkMapKey, 'Link' + linkMapKey);
+          linkMapKey++;
+        }
       }
     }
 
