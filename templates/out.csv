@@ -1,0 +1,4 @@
+Name,Version,Description,License,{{#links}}{{.}},{{/links}}
+{{#components}}
+{{ name }},{{ version }},{{ description }},{{ licenses }},{{#externalReferences}}{{ url }},{{/externalReferences}}
+{{/components}}

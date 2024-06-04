@@ -87,6 +87,35 @@ const renderToHtml = (analysis, templatePath) => {
   return output;
 };
 
+const renderToCsv = (analysis, templatePath) => {
+  const template = fs.readFileSync(templatePath, 'utf8');
+  const config = {};
+  // to escape commas in CSV, we need to do 2 things -
+  // 1. enclose the text in double quotes
+  // 2. escape any double quotes in the text itself with 2 double quotes
+  config.escape = s => {
+    if (s) {
+      s = s.replaceAll('"', '""');
+      return '"' + s + '"';
+    }
+    else {
+      return s;
+    }
+  };
+  const output = mustache.render(template, analysis, null, config);
+  return output;
+};
+
+const getOutputFile = (inputFile, ext) => {
+  const xt = path.extname(inputFile); // should return the file extension
+  if (xt.length > 0) { // if there is an extension, replace it with the 'ext' param's value
+    return inputFile.replaceAll(xt, ext);
+  }
+  else { // else the file has no extension, so append the 'ext' param's value
+    return inputFile + ext;
+  }
+};
+
 const viewBom = (inputFilePath, outputFilePath) => {
   // get the arguments
   const args = process.argv.slice(2);
@@ -98,14 +127,8 @@ const viewBom = (inputFilePath, outputFilePath) => {
   let outputFile = outputFilePath || args[1] || null;
 
   if (!outputFile) {
-    const pathElements = path.parse(inputFile);
-    if (pathElements) {
-      outputFile = pathElements.dir + path.sep + pathElements.name + '.html';
-      console.log('Output file will be written to: ' + outputFile);
-    }
-    else {
-      throw new Error('Usage: viewBom <inputBomFileInJson> <outputFileInHtml>'); 
-    }
+    outputFile = getOutputFile(inputFile, '.html');
+    console.log('HTML output file will be written to: ' + outputFile);
   }
 
   // read the json in the input file
@@ -117,6 +140,11 @@ const viewBom = (inputFilePath, outputFilePath) => {
 
   // write to a file
   fs.writeFileSync(outputFile, html);
+
+  outputFile = getOutputFile(inputFile, '.csv');
+  console.log('CSV output file will be written to: ' + outputFile);
+  const csv = renderToCsv(analysis, `${__dirname}/../templates/out.csv`);
+  fs.writeFileSync(outputFile, csv);
 
   process.exit(0);
 };
