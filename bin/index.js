@@ -8,7 +8,7 @@ const path = require('path');
   by Evan X. Merz
   https://www.npmjs.com/package/viewbom
 
-  viewBom is a dead simple package for converting a cyclonedx 
+  viewBom is a dead simple package for converting a cyclonedx
   software bill of materials into an html file. It also does
   a small amount of analysis.
 
@@ -26,9 +26,7 @@ const path = require('path');
 
 const analyze = (bom) => {
   const analysis = [];
-  const licenseMap = new Map();
-  const linkMap = new Map();
-  
+
   for(const component of bom.components) {
     
     const licenses = component.licenses;
@@ -38,46 +36,46 @@ const analyze = (bom) => {
       licenses.forEach(lic => {
         if (lic.license && lic.license.id) {
           licenseArray.push(lic.license.id);
-          licenseMap.set(lic.license.id, lic.license.id);
         }
       });
 
       licenseString = licenseArray.join(', ');
     }
-    
+
     const extRefs = component.externalReferences;
+    let website = '';
+    let vcs = '';
     if (extRefs) {
-      let linkMapKey = 1;
       for (const ref of extRefs) {
         if (ref.type) {
-          linkMap.set(ref.type, ref.type);
-        } else {
-          linkMap.set('Link' + linkMapKey, 'Link' + linkMapKey);
-          linkMapKey++;
+          if (ref.type === 'website') {
+            website = ref.url;
+          }
+          else if (ref.type === 'vcs') {
+            vcs = ref.url;
+          }
         }
       }
     }
 
-    analysis.push({ 
-      name: component.name, 
+    let maven = '';
+    if (website.length === 0 && vcs.length === 0 && component.purl && component.purl.startsWith('pkg:maven') && component.group && component.name) {
+      maven = 'https://search.maven.org/artifact/' + component.group + '/' + component.name;
+    }
+
+    analysis.push({
+      name: component.name,
       version: component.version,
       description: component.description,
       licenses: licenseString,
-      externalReferences: extRefs });
-  }
-
-  const lic = [];
-  for (const kv of licenseMap) {
-    lic.push(kv[0]);
-  }
-
-  const refs = [];
-  for (const kv of linkMap) {
-    refs.push(kv[0]);
+      externalReferences: extRefs,
+      website: website,
+      vcs: vcs,
+      maven: maven});
   }
 
   // returned the analyzed bom
-  return { licenses: lic, links: refs, components: analysis };
+  return { components: analysis };
 };
 
 

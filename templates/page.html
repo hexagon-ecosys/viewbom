@@ -12,25 +12,15 @@
   </head>
   <body>
     <main>
-      <div style="display: none;">
-        <h3>License Types</h3>
-        <ul>
-          {{#licenses}}
-          <li>{{.}}</li>
-          {{/licenses}}
-        </ul>
-      </div>
-      
-      <h3>Components</h3>
       <table border="">
           <tr>
             <th align="left">Name</th>
             <th align="left">Version</th>
             <th align="left">Description</th>
             <th align="left">License</th>
-            {{#links}}
-            <th align="left">{{.}}</th>
-            {{/links}}
+            <th align="left">Website</th>
+            <th align="left">VCS</th>
+            <th align="left">Maven</th>
           </tr>
 
           {{#components}}
@@ -38,10 +28,10 @@
             <td width="5%">{{ name }}</td>
             <td width="5%">{{ version }}</td>
             <td width="35%">{{ description }}</td>
-            <td width="5%">{{ licenses }}</td>
-            {{#externalReferences}}
-            <td>{{ url }}</td>
-            {{/externalReferences}}
+            <td width="10%">{{ licenses }}</td>
+            <td><a href="{{ website }}">{{ website }}</a></td>
+            <td><a href="{{ vcs }}">{{ vcs }}</a></td>
+            <td><a href="{{ maven }}">{{ maven }}</a></td>
           </tr>
           {{/components}}
         

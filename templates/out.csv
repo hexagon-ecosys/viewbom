@@ -1,4 +1,4 @@
-Name,Version,Description,License,{{#links}}{{.}},{{/links}}
+Name,Version,Description,License,Website,VCS,Maven
 {{#components}}
-{{ name }},{{ version }},{{ description }},{{ licenses }},{{#externalReferences}}{{ url }},{{/externalReferences}}
+{{ name }},{{ version }},{{ description }},{{ licenses }},{{ website }},{{ vcs }},{{ maven }}
 {{/components}}
