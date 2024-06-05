@@ -28,7 +28,11 @@ const analyze = (bom) => {
   const analysis = [];
 
   for(const component of bom.components) {
-    
+
+    if (component.version === 'unspecified') {
+      continue;
+    }
+
     const licenses = component.licenses;
     let licenseString = '';
     if (licenses) {
