@@ -38,8 +38,12 @@ const analyze = (bom) => {
     if (licenses) {
       const licenseArray = [];
       licenses.forEach(lic => {
-        if (lic.license && lic.license.id) {
-          licenseArray.push(lic.license.id);
+        if (lic.license) {
+          if (lic.license.id) {
+            licenseArray.push(lic.license.id);
+          } else if (lic.license.name) {
+            licenseArray.push(lic.license.name);
+          }
         }
       });
 
